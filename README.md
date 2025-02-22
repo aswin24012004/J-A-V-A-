@@ -2,4 +2,7 @@
 
 21/02
 
-i learn in aptitude 
+i learn in aptitude
+
+22/02
+ simply wasted, interview fail 

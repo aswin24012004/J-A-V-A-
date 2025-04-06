@@ -1,0 +1,95 @@
+### Main Program ##
+
+
+package com.aswin.dbconnection;
+
+import java.sql.*;
+import java.util.Scanner;
+
+public class PostgreSQLDemo {
+
+	public static void main(String[] args) {
+        // PostgreSQL database credentials
+        String url = "jdbc:postgresql://localhost:8080/testdb"; 
+        String user = "postgres";
+        String password = "root";
+        
+        
+        try {
+            // Step 1: Connect to database
+            Connection conn = DriverManager.getConnection(url, user, password);
+            System.out.println("✅ Connected to PostgreSQL database!");
+            
+            Scanner sc = new Scanner(System.in);
+
+            System.out.print("Enter number of users to insert: ");
+            int n = sc.nextInt();
+            sc.nextLine();
+            
+            for (int i = 0; i < n; i++) {
+                System.out.println("\nEnter details for user " + (i + 1) + ":");
+                System.out.print("ID: ");
+                int id = sc.nextInt();
+                sc.nextLine(); // consume newline
+
+                System.out.print("Name: ");
+                String name = sc.nextLine();
+
+                System.out.print("City: ");
+                String city = sc.nextLine();
+
+                // Create  object and insert
+                sampleData data = new sampleData(id, name, city);
+                
+                insertData(conn, data);
+            }            
+            
+            //  Print the data
+            /*
+			 * while (rs.next()) { int id = rs.getInt("id"); String name =
+			 * rs.getString("name"); String city = rs.getString("city");
+			 * System.out.println(id + " | " + name + " | " + city); }
+			 */
+            displayData(conn);
+
+            // Step 4: Close resources
+            
+            conn.close();
+        } catch (SQLException e) {
+            System.out.println("❌ Connection failed!");
+            e.printStackTrace();
+        }
+    }
+	public static void insertData(Connection conn,sampleData data) {
+		String query = "insert into sampleData(id,name,city) values(?,?,?)";
+		try {
+			PreparedStatement pst = conn.prepareStatement(query);
+			pst.setInt(1,data.getId());
+			pst.setString(2, data.getName());
+			pst.setString(3, data.getCity());
+			int rows = pst.executeUpdate();
+			if (rows > 0) {
+	            System.out.println("✅ Inserted: " + data);
+	        }
+		} catch (SQLException e) {
+            System.out.println("❌ Error inserting data: " + data.getName());
+            e.printStackTrace();
+        }
+		
+	}
+		static void displayData(Connection conn) {
+		String query = "select * from sampleData";
+		try {
+			Statement st = conn.createStatement();
+			ResultSet rs = st.executeQuery(query);
+			System.out.println("\n📋 Data from sampleData:");
+			while(rs.next()) {
+			System.out.println(rs.getInt("id") + " | " + rs.getString("name") + " | " + rs.getString("city"));
+		}
+	} catch (SQLException e) {
+	            System.out.println("❌ Error fetching data!");
+	            e.printStackTrace();
+	        }
+
+}
+}
